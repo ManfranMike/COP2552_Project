@@ -50,7 +50,7 @@
  * should be taken care of prior to calling this method.
  */
 
-package zooManager;
+package application;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -62,6 +62,9 @@ import java.util.Scanner;
 
 public class DataManager {
 	
+	public static boolean isInitialized = false;
+	public static String status;
+	
 	//Filename for save file. Using .dat so that average user has harder time opening it
 	public static final String SAVE_FILE_NAME = "save.dat";
 	
@@ -71,11 +74,15 @@ public class DataManager {
 	
 	//Method to initialize SaveManager. Loads file, as well.
 	public static void initialize(){
-		setFileName(SAVE_FILE_NAME);
-		setFile(fileName);
-		load();
-		System.out.println("Profile for " + SaveData.player.getFullName() + " loaded.");
-		System.out.println("Successfully loaded " + Edible.edibleCount + " edible objects, including " + Animal.animalCount + " animal objects.");
+		if(!isInitialized) {
+			setFileName(SAVE_FILE_NAME);
+			setFile(fileName);
+			load();
+			System.out.println("Profile for " + SaveData.player.getFullName() + " loaded.");
+			status = "Successfully loaded " + Edible.edibleCount + " edible objects, including " + Animal.animalCount + " animal objects.";
+			System.out.println(status);
+			isInitialized = true;
+		}
 	}
 	
 	
@@ -113,34 +120,43 @@ public class DataManager {
 			}
 		} catch(FileNotFoundException e) {
 			try {
-				System.out.println("No Save File Found. Creating New Save File...");
+				status = "No Save File Found. Creating New Save File...";
+				System.out.println(status);
 				file.createNewFile();
 			} catch (IOException x) {
-				System.out.println("Error: IO Exception occured while creating new save file.");
+				status = "Error: IO Exception occured while creating new save file.";
+				System.out.println(status);
 			} catch (SecurityException x) {
-				System.out.println("Error: Security Access to manipulate files denied.");
+				status = "Error: Security Access to manipulate files denied.";
+				System.out.println(status);
 			} catch (Exception x) {
-				System.out.println("Error: Something unexpected happened...");
+				status = "Error: Something unexpected happened...";
+				System.out.println(status);
 			} finally {
 				if(file.exists()) {
-					System.out.println("Save File created successfully.");
+					status = "Save File created successfully.";
+					System.out.println(status);
 					save();
 				}
 				else
-					System.out.println("Failed to create Save File");
+					status = "Failed to create Save File";
+					System.out.println(status);
 			}
 		} catch (Exception e) {
-			System.out.println("Error: Something unexpected happened...");
+			status = "Error: Something unexpected happened...";
+			System.out.println(status);
 		} finally {
 			if(pw != null)
 				pw.close();
 			if(file.exists())
-				System.out.println("Data Saved.");
+				status = "Data Saved.";
+				System.out.println(status);
 		}
 	}
 	
 	//Load objects into SaveData from external file
 	public static void load() {
+		
 		//Check if a save file exists already. If not, try to create it, and throw exceptions if an error occurs.
 		int inputLines = 0, numAnimals = 0;
 		String rawData = "";

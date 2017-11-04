@@ -18,7 +18,7 @@
  * a single String separated by the delimiter
  */
 
-package zooManager;
+package application;
 
 //All animals are edible, have the addition of a list of other Edibles they themselves can consume
 public class Animal extends Edible {

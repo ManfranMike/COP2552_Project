@@ -12,7 +12,7 @@
  * Just a data storage class with a few get/set methods.
  */
 
-package zooManager;
+package application;
 
 
 //This class describes all edible objects in the application. Edibles include Animals.
