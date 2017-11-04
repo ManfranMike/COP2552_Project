@@ -13,7 +13,7 @@
  * Get/Set methods for things that may be needed outside of it
  */
 
-package zooManager;
+package application;
 
 public class Player {
 	
