@@ -1,9 +1,12 @@
 package application;
 
+import java.net.URL;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -20,12 +23,12 @@ import javafx.scene.input.KeyEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-public class Controller {
+public class Controller implements Initializable{
 	
 	@FXML
 	Label lblStatus,lblNotLoaded,lblName,lblDesc;
 	@FXML
-	MenuItem menuLoad,menuSave,menuExit,menuAdd,menuDelete,menuAbout;
+	MenuItem menuLoad,menuSave,menuExit,menuAdd,menuEdit,menuAbout;
 	@FXML
 	TextField fieldSearch, fieldName, fieldDiet;
 	@FXML
@@ -36,6 +39,11 @@ public class Controller {
 	Tab tabDatabase,tabProperties,tabDiet;
 	@FXML
 	ListView<String> listDatabase,listDiet;
+	
+	
+	private static Animal selected; 
+	static boolean isEditing;
+	
 	
 	public void searchButtonClicked() {
 		System.out.println("Search for '" + fieldSearch.getText() + "'");
@@ -108,7 +116,6 @@ public class Controller {
 	
 	public void itemSelected() {
 		if(listDatabase.getSelectionModel().getSelectedItem() != null) {
-			System.out.println(listDatabase.getSelectionModel().getSelectedItem());
 			
 			Animal selection = DataManager.searchAnimals(listDatabase.getSelectionModel().getSelectedItem());
 			
@@ -120,6 +127,12 @@ public class Controller {
 			
 			tabProperties.setDisable(false);
 			tabDiet.setDisable(false);
+			menuEdit.setDisable(false);
+			
+			selected = selection;
+		}
+		else {
+			menuEdit.setDisable(true);
 		}
 	}
 	
@@ -189,7 +202,54 @@ public class Controller {
 		Alert alert = new Alert(AlertType.INFORMATION);
 		alert.setTitle("About Zoo Manager");
 		alert.setHeaderText(null);
-		alert.setContentText("Zoo Manager v0.3: Project 3 Edition\n\nCopyright© 2017 Michael Provan\n\nPost Questions and Issues at: https://github.com/ManfranMike/COP2552_Project");
+		alert.setContentText("Zoo Manager v0.4: Project 4 Edition\n\nCopyright© 2017 Michael Provan\n\nPost Questions and Issues at: https://github.com/ManfranMike/COP2552_Project");
 		alert.showAndWait();
+	}
+	
+	public void editEntry() throws Exception {
+		Stage stage;
+		Parent root;
+		
+		isEditing = true;
+		
+		stage = new Stage();
+		root = FXMLLoader.load(getClass().getResource("EditEntry.fxml"));
+		stage.setScene(new Scene(root));
+		stage.setTitle("Edit Entry");
+		stage.initModality(Modality.APPLICATION_MODAL);
+		stage.showAndWait();
+		
+		isEditing = false;
+		
+		saveData();
+		
+		populateDatabase();
+	}
+	
+	public void submitEditEntry() {
+		if(fieldName.getText().equals("") || fieldDesc.getText().equals("") || fieldDiet.getText().equals("")) {
+			Alert alert = new Alert(AlertType.WARNING);
+			alert.setTitle("Warning: All Fields Required");
+			alert.setHeaderText(null);
+			alert.setContentText("You must enter text in every field to save this Animal.");
+			alert.showAndWait();
+		}
+		else {
+			SaveData.animalsMap.remove(selected.getName().toUpperCase());
+			DataManager.addNewAnimal(fieldName.getText().split(",")[0], fieldDesc.getText().split(",")[0], fieldDiet.getText().split(","));
+			
+			cancel();
+		}
+	}
+
+
+	@Override
+	public void initialize(URL location, ResourceBundle resources) {
+		if(selected != null && isEditing) {
+			fieldName.setText(selected.getName());
+			fieldDesc.setText(selected.getDesc());
+			fieldDiet.setText(selected.getDietAsString(","));
+		}
+		
 	}
 }
